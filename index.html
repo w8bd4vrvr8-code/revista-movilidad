@@ -1,0 +1,97 @@
+
+ <!DOCTYPE html>
+<html>
+<head>
+  <title>Reportes</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .card {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 10px;
+      background: #0077b6;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+    .btn:hover { background: #023e8a; }
+  </style>
+</head>
+<body>
+
+<h1>Reportes de Accidentes</h1>
+<div id="lista"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs, query, orderBy } from 
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAsgFTWQZ0FxjJzz2ANi8JHFb26t4yHEe0",
+  authDomain: "revista-motos-e2.firebaseapp.com",
+  projectId: "revista-motos-e2",
+  storageBucket: "revista-motos-e2.firebasestorage.app",
+  messagingSenderId: "563468243518",
+  appId: "1:563468243518:web:ef441d3cc6ef139594b76f",
+  measurementId: "G-W7G2M2XFGJ
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const lista = document.getElementById("lista");
+
+async function cargarReportes() {
+  const q = query(collection(db, "Reportes"), orderBy("Fecha_Accidente", "desc"));
+  const querySnapshot = await getDocs(q);
+
+  lista.innerHTML = "";
+
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <strong>Edad:</strong> ${data.Edad} <br>
+      <strong>Usa casco:</strong> ${data.Usa_Casco} <br>
+      <strong>Exceso de velocidad:</strong> ${data.Exceso_Velocidad} <br>
+      <strong>Tipo de incidente:</strong> ${data.Tipo_Incidente} <br>
+      <strong>Lesiones:</strong> ${data.Lesiones} <br>
+      <strong>Ubicación:</strong> ${data.Ubicación} <br>
+
+      <strong>Fecha del accidente:</strong> 
+      ${data.Fecha_Accidente 
+        ? new Date(data.Fecha_Accidente.seconds * 1000).toLocaleDateString()
+        : "No disponible"} <br>
+
+      <strong>Fecha de registro:</strong> 
+      ${data.Fecha_Registro 
+        ? data.Fecha_Registro.toDate().toLocaleDateString()
+        : "No disponible"} <br>
+
+      ${
+        data.Link 
+        ? `<a href="${data.Link}" target="_blank" class="btn">Ver evidencia</a>`
+        : `<span>? Sin evidencia</span>`
+      }
+    `;
+
+    lista.appendChild(div);
+  });
+}
+
+cargarReportes();
+</script>
+
+</body>
+</html>
